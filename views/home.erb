@@ -1,41 +1,115 @@
-<div class="jumbotron text-center">
-  <div class="container">
-    <a href="/" class="lang-logo">
-      <img src="images/lang-logo.png">
-    </a>
-    <h1>Welcome SURESH</h1>
-    <p>Heroku Connect example and automatic deployment using github.</p>
-    <a type="button" class="btn btn-lg btn-default" href="/create"><span class="glyphicon glyphicon-flash"></span> Connect with your Salesforce Org</a>
-    <a type="button" class="btn btn-lg btn-primary" href="https://github.com/heroku/no-local-dev-getting-started"><span class="glyphicon glyphicon-download"></span> Source on GitHub</a>
-  </div>
-</div>
-<div class="container">
-  <div class="alert alert-info text-center" role="alert">
-    To deploy your own copy, and learn the fundamentals of the Heroku platform, head over to the <a href="https://devcenter.heroku.com/articles/getting-started-with-heroku-and-connect-without-local-dev" class="alert-link">Getting Started on Heroku with Heroku Connect</a> tutorial.
-  </div>
-  <hr>
-  <div class="row">
-    <div class="col-md-6">
-      <h3><span class="glyphicon glyphicon-info-sign"></span> How this tutorial works</h3>
-      <ul>
-        <li>This app was deployed to Heroku by clicking the <a href="https://github.com/heroku/no-local-dev-getting-started">Heroku Button</a> in the <a href="https://devcenter.heroku.com/articles/getting-started-with-heroku-and-connect-without-local-dev">tutorial</a>.</li>
-        <li>Heroku Button transfers the source code for the application, transfers any app dependencies, builds and deploys the app on Heroku, and provisions a web domain for it too.</li>
-        <li>The app will also provision a Heroku Postgres database, and a Heroku Connect add-on, one of over <a href="https://elements.heroku.com/addons">150 add-on services</a>.</li>
-        <li>Heroku Connect provides seamless data synchronisation between a Heroku Postgres database and a Salesforce Org.  Clicking the "Connect with your Salesforce Org" configures Heroku Connect to perform this sync. </li>
-      <li>Check out the <a href="https://devcenter.heroku.com/articles/getting-started-with-heroku-and-connect-without-local-dev">Getting Started</a> guide to learn more!</li>
-      </ul>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Phone Changer</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <style>
+        body {
+            padding-top: 60px;
+        }
+    </style>
+    <script>
+        $(function() {
+            $("#phoneChangerForm").submit(function(event) {
+                event.preventDefault();
+
+                var errorMessage = $("#errorMessage");
+                var error = $("#error");
+                error.hide();
+
+                $("#message").hide();
+
+                var firstName = $("#firstName").val();
+                var lastName = $("#lastName").val();
+                var email = $("#email").val();
+                var phone = $("#phone").val();
+
+                if (firstName.length == 0 || lastName.length == 0 || email.length == 0 || phone.length == 0) {
+                    errorMessage.text("All of the fields are required.");
+                    error.show();
+                }
+                else {
+                    $.ajax({
+                        url: event.target.action,
+                        method: event.target.method,
+                        data: JSON.stringify({
+                            firstName: firstName,
+                            lastName: lastName,
+                            email: email,
+                            phone: phone
+                        }),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function(data) {
+                            $("#firstName").val("");
+                            $("#lastName").val("");
+                            $("#email").val("");
+                            $("#phone").val("");
+                            $("#messageMessage").text("Record updated!");
+                            $("#message").show();
+                        },
+                        error: function(err) {
+                            errorMessage.text(err.responseJSON.error);
+                            error.show();
+                        }
+                    })
+                }
+            });
+        });
+
+    </script>
+</head>
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">Phone Number Changer</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <form id="phoneChangerForm" action="/update" method="post" style="width: 400px">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Update Your Phone Number</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" class="form-control" id="firstName" placeholder="For verification" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" class="form-control" id="lastName" placeholder="For verification" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" placeholder="For verification" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="tel" class="form-control" id="phone" placeholder="New Phone Number" required>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div id="message" class="alert alert-info" role="alert" style="display: none;">
+                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                        <span id="messageMessage"></span>
+                    </div>
+                    <div id="error" class="alert alert-danger" role="alert" style="display: none;">
+                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                        <span class="sr-only">Error:</span>
+                        <span id="errorMessage"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Phone Number</button>
+                </div>
+            </div>
+        </form>
     </div>
-    <div class="col-md-6">
-      <h3><span class="glyphicon glyphicon-link"></span> Helpful Links</h3>
-      <ul>
-        <li><a href="https://www.heroku.com/home">Heroku</a></li>
-        <li><a href="https://devcenter.heroku.com/">Heroku Dev Center</a></li>
-        <li><a href="https://devcenter.heroku.com/articles/getting-started-with-heroku-and-connect-without-local-dev">Getting Started on Heroku with Heroku Connect</a></li>
-        <li><a href="https://devcenter.heroku.com/articles/herokuconnect">Heroku Connect</a></li>
-      </ul>
-    </div>
-  </div> <!-- row -->
-   <div class="alert alert-info text-center" role="alert">
-    Please do work through the Getting Started guide, even if you do know how to build such an application.  The guide covers the basics of working with Heroku and Heroku Connect, and will familiarize you with all the concepts you need in order to build and deploy your own apps.
-  </div>
-</div>
+</body>
+</html>
